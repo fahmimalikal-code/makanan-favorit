@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />    
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dark Pink Mystery Surprise — Flowers Edition</title>
+
+<style>
+  :root{--bg:#0a0a0f;--pink1:#ff3b88;--pink2:#ff77c7;--flower:#ffaad9}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:var(--bg);color:#fff;overflow:hidden}
+  .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center}
+
+  #startBtn{padding:12px 28px;background:linear-gradient(135deg,var(--pink1),var(--pink2));border:none;border-radius:8px;color:#fff;font-size:18px;cursor:pointer;box-shadow:0 8px 30px rgba(255,59,136,0.18)}
+  .modal{background:linear-gradient(180deg, rgba(255,20,147,0.06), rgba(255,20,147,0.03));padding:22px;border-radius:12px;border:1px solid rgba(255,59,136,0.14);backdrop-filter:blur(8px);box-shadow:0 10px 40px rgba(0,0,0,0.6)}
+  .modal input{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.2);color:#fff;width:70%;outline:none}
+  .modal button{padding:10px 16px;border-radius:8px;border:none;background:var(--pink1);color:#fff;cursor:pointer}
+  .hint{color:var(--pink2);margin-top:8px;font-size:14px}
+
+  /* Gift */
+  .gift-container{position:relative;width:220px;height:200px;margin:0 auto;transform-style:preserve-3d;cursor:pointer;transition:transform .25s ease}
+  .box{position:absolute;left:0;right:0;margin:0 auto;bottom:0;width:220px;height:140px;background:linear-gradient(180deg,#1a0010,#2a001b);border-radius:12px;border:2px solid rgba(255,255,255,0.03);box-shadow:0 30px 80px rgba(0,0,0,0.7)}
+  .lid{position:absolute;top:-26px;left:50%;transform:translateX(-50%);width:260px;height:60px;background:linear-gradient(90deg,var(--pink2),var(--pink1));border-radius:12px;transform-origin:center bottom;transition:transform .9s cubic-bezier(.2,.9,.2,1);box-shadow:0 12px 40px rgba(255,59,136,0.15)}
+  .ribbon-vertical{position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:24px;height:140px;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.06));border-radius:6px}
+  .ribbon-horizontal{position:absolute;left:50%;transform:translateX(-50%);bottom:64px;width:220px;height:20px;background:linear-gradient(90deg,rgba(255,255,255,0.06),rgba(0,0,0,0.06));border-radius:8px}
+  .gift-container.open .lid{transform:translateX(-50%) translateY(-120px) rotateX(60deg)}
+  .gift-container.open{transform:scale(1.06)}
+
+  /* MESSAGE BOX */
+  #messageBox {
+    display: none;
+    width: 90%;
+    max-width: 800px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+  }
+
+  #messageTitle {
+    color: var(--pink2);
+    text-shadow: 0 0 18px rgba(255,119,199,0.12);
+    margin-bottom: 12px;
+  }
+
+  #message-container {
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 24px;
+    border-left: 2px solid rgba(255, 180, 220, 0.4);
+    scroll-behavior: smooth;
+  }
+
+  .message-line {
+    opacity: 0;
+    transform: translateX(60px);
+    transition: 0.7s ease;
+    margin: 18px 0;
+    font-size: 18px;
+    color: #ffd9ec;
+    line-height: 1.7;
+  }
+
+  .message-line.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .photo {
+    width: 260px;
+    border-radius: 14px;
+    margin: 18px auto;
+    display: block;
+    opacity: 0;
+    filter: blur(6px);
+    transition: 1s ease;
+  }
+
+  .photo.revealed {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  /* Petals */
+  .petal{position:fixed;width:18px;height:18px;background:var(--flower);border-radius:60% 40% 60% 40%;opacity:.9;pointer-events:none;animation:petalFall linear forwards}
+  @keyframes petalFall{
+    0%{transform:translateY(-40px) rotate(0deg);opacity:1}
+    100%{transform:translateY(120vh) rotate(260deg);opacity:0}
+  }
+
+/* --- LUXURY SCROLL + PARALLAX TEXT --- */
+
+#message-container {
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 10px 28px;
+  scroll-behavior: smooth;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 145, 200, 0.08),
+    rgba(0, 0, 0, 0.25)
+  );
+  border-left: 2px solid rgba(255, 150, 210, 0.35);
+  border-right: 1px solid rgba(255, 150, 210, 0.12);
+  backdrop-filter: blur(12px);
+
+  box-shadow: 0 0 40px rgba(255, 60, 140, 0.08);
+  border-radius: 12px;
+}
+
+.message-line {
+  opacity: 0;
+  transform: translateX(60px) translateY(10px);
+  filter: blur(6px);
+
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s cubic-bezier(.23,1,.32,1),
+    filter 1s ease;
+
+  margin: 18px 0;
+  font-size: 20px;
+  letter-spacing: .3px;
+  line-height: 1.6;
+  color: #ffddea;
+}
+
+.message-line.show {
+  opacity: 1;
+  transform: translateX(0px) translateY(0px);
+  filter: blur(0px);
+}
+
+/* Parallax smooth */
+#message-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#message-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 110, 170, 0.45);
+  border-radius: 8px;
+}
+
+#message-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+#message-container {
+  perspective: 900px;
+}
+
+.message-line {
+  transform-style: preserve-3d;
+}
+
+.message-line.show {
+  transform: translateX(0) translateY(0) rotateX(0deg);
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="startScreen" class="center">
+  <h2 style="color:var(--pink2);text-shadow:0 0 18px rgba(255,119,199,0.14)">Hari ini ada sesuatu yang istimewa untukmu</h2>
+  <button id="startBtn">Mulai</button>
+</div>
+
+<div id="riddleBox" class="center" style="display:none">
+  <div class="modal">
+    <h3 style="margin:0 0 8px 0;color:var(--pink2)">Di isi dulu</h3>
+    <p style="margin:0 0 12px 0;opacity:.95">Aku membuat hari-hari terasa ringan dan hati tersenyum. Apa aku?</p>
+    <input id="ans" placeholder="Tulis jawaban..." autocomplete="off" />
+    <div style="margin-top:12px;display:flex;gap:10px;justify-content:center">
+      <button id="submitRiddle">Jawab</button>
+      <button id="hintBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff">Petunjuk</button>
+    </div>
+    <div id="hint" class="hint" style="display:none">Petunjuk: hadir saat hati tersenyum, tapi bukan benda.</div>
+  </div>
+</div>
+
+<div id="giftBox" class="center" style="display:none">
+  <div class="gift-container" id="giftAnim">
+    <div class="lid"></div>
+    <div class="box"></div>
+    <div class="ribbon-vertical"></div>
+    <div class="ribbon-horizontal"></div>
+  </div>
+  <p style="opacity:.7;margin-top:10px">Pencet kotaknya ya</p>
+</div>
+
+<div id="messageBox">
+  <h2 id="messageTitle">For You ❤️</h2>
+  <div id="message-container"></div>
+  <img id="photoEl" class="photo" src="">
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  const PHOTO_URL = "Syahara.jpg";
+  const ANSWER = "kebahagiaan";
+
+  const MESSAGE_LINES = [
+    "Selamat ulang tahun, Rhimaaa.",
+    "Hari ini dunia terasa sangat spesial,",
+    "karena tepat 16 tahun lalu, Wanita yang aku cinta dilahirkan.",
+
+    "Ada banyak hal dalam hidup yang sulit dijelaskan.",
+    "Tapi ada satu hal yang selalu terasa jelas:",
+    "caramu hadir membuat semuanya lebih tenang.",
+
+    "Kamu tidak perlu menjadi siapa-siapa.",
+    "Cukup jadi dirimu yang sekarang.",
+    "Dan itu sudah lebih dari cukup.",
+
+    "Aku selalu kagum pada caramu kuat,",
+    "pada caramu sabar,",
+    "dan pada caramu tetap lembut meski dunia tidak selalu ramah.",
+
+    "Di hari bertambahnya usiamu,",
+    "aku cuma ingin mengucapkan:",
+    "semoga hidup memperlakukanmu dengan lembut.",
+    "Semoga hal-hal baik menemukanmu tanpa kamu minta.",
+    "Semoga damai datang tanpa dicari.",
+    "Dan semoga kamu tidak pernah merasa sendirian.",
+
+    "Terima kasih karena selalu memancarkan kebaikan dan kehangatan",
+    "Terima kasih karena menjadi dirimu yang luar biasa.",
+    
+    "Selamat ulang tahun.",
+    "Semoga tahun ini menjadi tahun terbaikmu."
+  ];
+
+  const startScreen = document.getElementById("startScreen");
+  const startBtn = document.getElementById("startBtn");
+  const riddleBox = document.getElementById("riddleBox");
+  const ansInput = document.getElementById("ans");
+  const hintBtn = document.getElementById("hintBtn");
+  const hintEl = document.getElementById("hint");
+  const submitRiddle = document.getElementById("submitRiddle");
+
+  const giftBox = document.getElementById("giftBox");
+  const giftAnim = document.getElementById("giftAnim");
+
+  const messageBox = document.getElementById("messageBox");
+  const messageContainer = document.getElementById("message-container");
+  const photoEl = document.getElementById("photoEl");
+
+  /* --- MULAI --- */
+  startBtn.addEventListener("click", () => {
+    startScreen.style.display = "none";
+    riddleBox.style.display = "block";
+    ansInput.focus();
+  });
+
+  hintBtn.addEventListener("click", () => {
+    hintEl.style.display = "block";
+    hintBtn.disabled = true;
+  });
+
+  submitRiddle.addEventListener("click", () => {
+    const v = ansInput.value.trim().toLowerCase();
+    if (!v) return;
+
+    if (v === ANSWER) {
+      riddleBox.style.display = "none";
+      giftBox.style.display = "block";
+    } else {
+      ansInput.value = "";
+      hintEl.innerText = "Coba lagi. Ini tentang perasaan.";
+      hintEl.style.display = "block";
+    }
+  });
+
+  ansInput.addEventListener("keyup", e => {
+    if (e.key === "Enter") submitRiddle.click();
+  });
+
+  /* --- GIFT CLICK --- */
+  giftAnim.addEventListener("click", () => {
+  if (giftAnim.classList.contains("open")) return; // mencegah klik kedua   
+  giftAnim.classList.add("open");
+
+    // Delay masuk ke pesan
+    setTimeout(() => {
+      giftBox.style.display = "none";
+      showMessages();
+    }, 900);
+  });
+
+    /* --- SHOW MESSAGES --- */
+  function showMessages() {
+    messageBox.style.display = "block";
+
+    MESSAGE_LINES.forEach((line, i) => {
+      const div = document.createElement("div");
+      div.className = "message-line";
+      div.textContent = line;
+      messageContainer.appendChild(div);
+
+      setTimeout(() => {
+        div.classList.add("show");
+      }, 300 * i);
+    });
+
+    // foto muncul terakhir
+    setTimeout(() => {
+      photoEl.src = PHOTO_URL;
+      photoEl.classList.add("revealed");
+    }, MESSAGE_LINES.length * 300 + 600);
+  }
+
+});
+</script>
+
+</body>
+</html>
